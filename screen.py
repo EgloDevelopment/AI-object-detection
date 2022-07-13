@@ -2,9 +2,7 @@ import cv2
 import numpy as np
 import pyautogui
 import pygetwindow as gw
-import sys
 import time
-import os 
 from imageai.Detection import ObjectDetection
 from tensorflow.python.framework.ops import disable_eager_execution
 disable_eager_execution()
@@ -47,4 +45,5 @@ for i in range(int(fps)):
         break
 
 # make sure everything is closed when exited
+
 cv2.destroyAllWindows()

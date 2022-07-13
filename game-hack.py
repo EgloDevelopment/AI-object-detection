@@ -7,6 +7,8 @@ import cv2
 import time
 import mss
 import win32api, win32con
+import os
+from PyQt5 import QtWidgets
 
 def main():
 
@@ -34,8 +36,11 @@ def main():
     # What key to press to quit and shutdown the autoaim
     aaQuitKey = "M"
 
-    # If you want to main slightly upwards towards the head
-    headshot_mode = True
+    # If you want to aim slightly upwards towards the head
+    headshot_mode = False
+
+    # Rapid fire
+    rapidfire = True
 
     # Trigger bot
     trigger_bot = False
@@ -53,6 +58,7 @@ def main():
 
     # Set to True if you want to get the visuals
     visuals = True
+
     # Selecting the correct game window
     try:
         videoGameWindows = pyautogui.getWindowsWithTitle(videoGameWindowTitle)
@@ -96,7 +102,7 @@ def main():
     last_mid_coord = None
     aimbot=False
 
-    while win32api.GetAsyncKeyState(ord(aaQuitKey)) == 0:
+    while win32api.GetAsyncKeyState(0x2D) == 0:
         # Getting screenshop, making into np.array and dropping alpha dimention.
         npImg = np.delete(np.array(sct.grab(sctArea)), 3, axis=2)
 
@@ -138,7 +144,7 @@ def main():
             cv2.circle(npImg, (int(mouseMove[0] + xMid), int(mouseMove[1] + yMid - headshot_offset)), 3, (0, 0, 255))
 
             if aim_bot:
-                if win32api.GetKeyState(0x14):
+                if win32api.GetKeyState(0x06):
                     win32api.mouse_event(win32con.MOUSEEVENTF_MOVE, int(mouseMove[0] * aaMovementAmp), int(mouseMove[1] * aaMovementAmp), 0, 0)
                     # Making trigger-bot
                     if aim_trigger:
@@ -149,7 +155,6 @@ def main():
             else:
                 if trigger_bot:
                     time.sleep(trigger_delay)
-                    win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN, int(mouseMove[0] * aaMovementAmp), int(mouseMove[1] * aaMovementAmp),0,0)
                     time.sleep(fire_for)
                     win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP, int(mouseMove[0] * aaMovementAmp), int(mouseMove[1] * aaMovementAmp),0,0)
 
@@ -157,6 +162,12 @@ def main():
 
         else:
             last_mid_coord = None
+
+        if rapidfire:
+            if win32api.GetKeyState(0x05): #Side mouse button
+                win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN, 0,0,0,0)
+                time.sleep(0.01)
+                win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP, 0,0,0,0)
 
 
         # See what the bot sees
@@ -192,6 +203,8 @@ def main():
             cv2.imshow('Debug mode', npImg)
             if (cv2.waitKey(1) & 0xFF == ord("q")) or (cv2.waitKey(1)==27):
                 break
+    
+
 
 if __name__ == "__main__":
     main()
